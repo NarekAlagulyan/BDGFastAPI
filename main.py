@@ -9,7 +9,7 @@ from models import User, Story, Comment
 from typing import List
 
 from db import get_db_session
-from serializers import UserCreateSerializer, UserGetSerializer, PostCreateSerializer, PostGetSerializer
+from serializers import UserCreateSerializer, UserGetSerializer, StoryCreateSerializer, StoryGetSerializer
 
 app = FastAPI()
 
@@ -36,21 +36,22 @@ def get_users_list(db_session: Session = Depends(get_db_session)):
     query = (
         select(User)
     )
-    users = db_session.execute(query)
+    users = db_session.scalars(query)
 
     return users
 
 
 
-@app.post('/users/{user_id}/stories', response_model=PostGetSerializer)
+@app.post('/users/{user_id}/stories', response_model=StoryGetSerializer)
 def create_story(
         user_id: int,
-        story_data: PostCreateSerializer,
+        story_data: StoryCreateSerializer,
         db_session: Session = Depends(get_db_session)
 ):
     story = Story(
-        text=story_data.name,
-        author_id=user_id
+        text=story_data.text,
+        author_id=user_id,
+        music=story_data.music
     )
     db_session.add(story)
     db_session.commit()
@@ -60,7 +61,7 @@ def create_story(
 
 
 
-@app.get('/users/{user_id}/stories', response_model=List[PostGetSerializer])
+@app.get('/users/{user_id}/stories', response_model=List[StoryGetSerializer])
 def get_user_stories_list(
         user_id: int,
         db_session: Session = Depends(get_db_session)
@@ -69,6 +70,7 @@ def get_user_stories_list(
         select(Story)
         .where(Story.author_id == user_id)
     )
-    posts = db_session.execute(query)
+    posts = db_session.scalars(query)
+    print(posts)
 
     return posts

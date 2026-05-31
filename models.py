@@ -8,7 +8,6 @@ from db import Model
 class User(Model):
     __tablename__ = "users"
 
-
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     username: Mapped[str] = mapped_column(unique=True, index=True)
     password: Mapped[str]
@@ -24,9 +23,9 @@ class Story(Model):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     text: Mapped[str]
     date: Mapped[datetime] = mapped_column(default=datetime.now, index=True)
-    music: Mapped[str]
+    music: Mapped[str | None]
 
-    author_id: Mapped[int] = relationship(ForeignKey("users.id"))
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     # Relationships
     author: Mapped["User"] = relationship(back_populates="stories")
@@ -39,5 +38,10 @@ class Comment(Model):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     text: Mapped[str]
     date: Mapped[datetime] = mapped_column(default=datetime.now, index=True)
-    author_id: Mapped[int] = relationship(ForeignKey("users.id"))
-    story_id: Mapped[int] = relationship(ForeignKey("stories.id"))
+
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    story_id: Mapped[int] = mapped_column(ForeignKey("stories.id"))
+
+    # Adding back-populates to match User and Story expectations
+    author: Mapped["User"] = relationship(back_populates="comments")
+    story: Mapped["Story"] = relationship(back_populates="comments")

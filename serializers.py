@@ -14,13 +14,14 @@ class UserGetSerializer(BaseSerializer):
         from_attributes = True
 
 
-class PostCreateSerializer(BaseSerializer):
-    name: str
+class StoryCreateSerializer(BaseSerializer):
+    text: str
+    music: str | None = None
 
 
-class PostGetSerializer(BaseSerializer):
+class StoryGetSerializer(BaseSerializer):
     id: int
-    name: str
+    text: str
     author_id: int
 
     class Config:
